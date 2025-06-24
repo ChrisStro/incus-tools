@@ -4,7 +4,7 @@ Since the automatic snapshot engine in incus is not sufficient for me, I have cr
 
 ```
 # Install snapshot-engine
-curl https://raw.githubusercontent.com/ChrisStro/incus-auto-snapshot/install-incus-auto-snapshot.sh | bash -
+curl https://raw.githubusercontent.com/ChrisStro/incus-auto-snapshot/refs/heads/main/install-incus-snapshot.sh | bash -
 ```
 
 ## Notes
