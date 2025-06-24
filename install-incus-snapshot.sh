@@ -1,7 +1,7 @@
 # install incus-auto-snapshot
 wget -O /usr/local/bin/incus-auto-snapshot https://raw.githubusercontent.com/ChrisStro/incus-auto-snapshot/refs/heads/main/incus-auto-snapshot.py
-chmod +x /usr/local/bin/incus-auto-snapshot
-chmod 0600 /usr/local/bin/incus-auto-snapshot
+chown root:incus-admin /usr/local/bin/incus-auto-snapshot
+chmod 0700 /usr/local/bin/incus-auto-snapshot
 
 # config file
 cat << EOF > /etc/incus-auto-snapshot.conf
@@ -129,5 +129,5 @@ OnCalendar=Sun *-*-01..07 02:35:00
 WantedBy=timers.target
 EOF
 
-#
-systemctl status {incus-auto-snapshot-frequent.timer,incus-auto-snapshot-hourly.timer,incus-auto-snapshot-daily.timer,incus-auto-snapshot-weekly.timer,incus-auto-snapshot-monthly.timer}
+# enable timers
+systemctl enable --now incus-auto-snapshot-{frequent,hourly,daily,weekly,monthly}.timer
