@@ -42,5 +42,5 @@ Script and systemd service + timer to trigger pull copy from remote instances.
 
 ```
 # Install repl-engine
-curl https://raw.githubusercontent.com/ChrisStro/incus-tools/refs/heads/main/repl-instance/install-repl-instance.sh | bash -
+curl https://raw.githubusercontent.com/ChrisStro/incus-tools/refs/heads/main/repl-instance/install-incus-repl-instance.sh | bash -
 ```
