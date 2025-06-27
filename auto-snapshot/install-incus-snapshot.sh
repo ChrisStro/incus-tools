@@ -15,9 +15,6 @@ daily_expire    = 14d
 weekly_expire   = 4w
 # 3  Mounths
 monthly_expire  = 3m
-
-# Include custom storage volumes
-include_volumes  = True
 EOF
 chmod 0600 /etc/incus-auto-snapshot.conf
 chown root:root /etc/incus-auto-snapshot.conf
@@ -29,7 +26,7 @@ Description=Service for frequent incus snapshots
 
 [Service]
 EnvironmentFile=/etc/incus-auto-snapshot.conf
-ExecStart=incus-auto-snapshot --prefix frequent --expiry \$frequent_expire --include-volumes=\$include_volumes
+ExecStart=incus-auto-snapshot --prefix frequent --expiry \$frequent_expire --include-volumes
 StandardOutput=append:/var/log/incus-auto-snapshot.log
 StandardError=append:/var/log/incus-auto-snapshot.log
 EOF
@@ -51,7 +48,7 @@ Description=Service for hourly incus snapshots
 
 [Service]
 EnvironmentFile=/etc/incus-auto-snapshot.conf
-ExecStart=incus-auto-snapshot --prefix hourly --expiry \$hourly_expire --include-volumes=\$include_volumes
+ExecStart=incus-auto-snapshot --prefix hourly --expiry \$hourly_expire --include-volumes
 StandardOutput=append:/var/log/incus-auto-snapshot.log
 StandardError=append:/var/log/incus-auto-snapshot.log
 EOF
@@ -73,7 +70,7 @@ Description=Service for daily incus snapshots
 
 [Service]
 EnvironmentFile=/etc/incus-auto-snapshot.conf
-ExecStart=incus-auto-snapshot --prefix daily --expiry \$daily_expire --include-volumes=\$include_volumes
+ExecStart=incus-auto-snapshot --prefix daily --expiry \$daily_expire --include-volumes
 StandardOutput=append:/var/log/incus-auto-snapshot.log
 StandardError=append:/var/log/incus-auto-snapshot.log
 EOF
@@ -95,7 +92,7 @@ Description=Service for weekly incus snapshots
 
 [Service]
 EnvironmentFile=/etc/incus-auto-snapshot.conf
-ExecStart=incus-auto-snapshot --prefix weekly --expiry \$weekly_expire --include-volumes=\$include_volumes
+ExecStart=incus-auto-snapshot --prefix weekly --expiry \$weekly_expire --include-volumes
 StandardOutput=append:/var/log/incus-auto-snapshot.log
 StandardError=append:/var/log/incus-auto-snapshot.log
 EOF
@@ -117,7 +114,7 @@ Description=Service for monthly incus snapshots
 
 [Service]
 EnvironmentFile=/etc/incus-auto-snapshot.conf
-ExecStart=incus-auto-snapshot --prefix monthly --expiry \$monthly_expire --include-volumes=\$include_volumes
+ExecStart=incus-auto-snapshot --prefix monthly --expiry \$monthly_expire --include-volumes
 StandardOutput=append:/var/log/incus-auto-snapshot.log
 StandardError=append:/var/log/incus-auto-snapshot.log
 EOF
