@@ -15,7 +15,7 @@ Since the automatic snapshot engine in incus is not sufficient for me, I have cr
 
 ```
 # Install snapshot-engine
-curl https://raw.githubusercontent.com/ChrisStro/incus-auto-snapshot/refs/heads/main/auto-snapshot/install-incus-snapshot.sh | bash -
+curl https://raw.githubusercontent.com/ChrisStro/incus-tools/refs/heads/main/auto-snapshot/install-incus-snapshot.sh | bash -
 ```
 
 Every instance(or custom storage volume) with the custom user config user.auto-snapshot=true will be targeted by the snapshot-engine, you can apply these settings via instance or profiles
@@ -42,5 +42,5 @@ Script and systemd service + timer to trigger pull copy from remote instances.
 
 ```
 # Install repl-engine
-curl https://raw.githubusercontent.com/ChrisStro/incus-auto-snapshot/refs/heads/main/repl-instance/install-repl-instance.sh | bash -
+curl https://raw.githubusercontent.com/ChrisStro/incus-tools/refs/heads/main/repl-instance/install-repl-instance.sh | bash -
 ```
