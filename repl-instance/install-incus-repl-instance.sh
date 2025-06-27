@@ -1,5 +1,5 @@
 # install incus-auto-snapshot
-wget -O /usr/local/bin/incus-repl-instance https://raw.githubusercontent.com/ChrisStro/incus-auto-snapshot/refs/heads/main/incus-repl-instance.py
+wget -O /usr/local/bin/incus-repl-instance https://raw.githubusercontent.com/ChrisStro/incus-tools/refs/heads/main/repl-instance/incus-repl-instance.py
 chown root:root /usr/local/bin/incus-repl-instance
 chmod 0700 /usr/local/bin/incus-repl-instance
 

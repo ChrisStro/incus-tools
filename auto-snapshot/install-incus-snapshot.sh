@@ -1,5 +1,5 @@
 # install incus-auto-snapshot
-wget -O /usr/local/bin/incus-auto-snapshot https://raw.githubusercontent.com/ChrisStro/incus-auto-snapshot/refs/heads/main/incus-auto-snapshot.py
+wget -O /usr/local/bin/incus-auto-snapshot https://raw.githubusercontent.com/ChrisStro/incus-tools/refs/heads/main/auto-snapshot/incus-auto-snapshot.py
 chown root:incus-admin /usr/local/bin/incus-auto-snapshot
 chmod 0700 /usr/local/bin/incus-auto-snapshot
 
