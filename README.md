@@ -44,3 +44,23 @@ Script and systemd service + timer to trigger pull copy from remote instances.
 # Install repl-engine
 curl https://raw.githubusercontent.com/ChrisStro/incus-tools/refs/heads/main/repl-instance/install-incus-repl-instance.sh | bash -
 ```
+
+Instances with the custom user configuration user.repl-instance=true will be copied or refreshed to the target project. By default, only the root disk will be copied. All replications run in stateless mode.
+
+Custom volumes with the user configuration user.repl-volume=true will be copied or refreshed to the target storage pool.
+
+You can clear snapshots before starting replication by using the --snap-name-to-clear parameter. This is useful if you have snapshots with a short retention period (frequents) but your replication only runs once per day.
+
+```
+# Profile
+incus profile set default user.auto-snapshot=true
+
+# Instance
+incus config set MYINSTANCE user.auto-snapshot=true
+
+# Exclude instance if applied via profile
+incus config set MYINSTANCE user.auto-snapshot=false # other value than 'true'
+
+# Check which instances are targeted
+incus ls user.auto-snapshot=true
+```

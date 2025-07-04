@@ -6,10 +6,6 @@ import asyncio
 import argparse
 import json
 
-# def get_local_instances():
-#     p = subprocess.run(["incus","list","-cn","-f","csv","user.auto-snapshot=true"], capture_output=True, text=True)
-#     return p.stdout.splitlines()
-
 class IncusSnapper():
     def __init__(self,**kwargs):
         # Instances
@@ -70,7 +66,7 @@ class IncusSnapper():
         p = subprocess.run(["incus","storage","list","-cn","-f","csv"], capture_output=True, text=True)
         return p.stdout.splitlines()
 
-    def get_custom_volumes(self,pool):
+    def _get_custom_volumes(self,pool):
         p = subprocess.run(["incus","storage","volume","list",pool,"-cn","-f","json","type=custom" ], capture_output=True, text=True)
         json_data = json.loads(p.stdout.strip())
         return [v for v in json_data if v.get('config',{}).get("user.auto-snapshot") == "true"]
@@ -119,7 +115,7 @@ class IncusSnapper():
         # storage
         if self.pools:
             for pool in self.pools:
-                volumes = self.get_custom_volumes(pool)
+                volumes = self._get_custom_volumes(pool)
                 tasks_storage_set = [asyncio.create_task(self._set_volume_expiry(pool,volume['name'])) for volume in volumes]
                 await asyncio.gather(*tasks_storage_set)
                 tasks_storage_snap = [asyncio.create_task(self._snap_volume(pool,volume['name'])) for volume in volumes]
