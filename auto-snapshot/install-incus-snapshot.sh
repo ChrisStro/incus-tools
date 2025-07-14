@@ -27,8 +27,8 @@ Description=Service for frequent incus snapshots
 [Service]
 EnvironmentFile=/etc/incus-auto-snapshot.conf
 ExecStart=incus-auto-snapshot --prefix frequent --expiry \$frequent_expire --include-volumes
-StandardOutput=append:/var/log/incus-auto-snapshot.log
-StandardError=append:/var/log/incus-auto-snapshot.log
+#StandardOutput=append:/var/log/incus-auto-snapshot.log
+#StandardError=append:/var/log/incus-auto-snapshot.log
 EOF
 cat << EOF > /etc/systemd/system/incus-auto-snapshot-frequent.timer
 [Unit]
@@ -49,8 +49,8 @@ Description=Service for hourly incus snapshots
 [Service]
 EnvironmentFile=/etc/incus-auto-snapshot.conf
 ExecStart=incus-auto-snapshot --prefix hourly --expiry \$hourly_expire --include-volumes
-StandardOutput=append:/var/log/incus-auto-snapshot.log
-StandardError=append:/var/log/incus-auto-snapshot.log
+#StandardOutput=append:/var/log/incus-auto-snapshot.log
+#StandardError=append:/var/log/incus-auto-snapshot.log
 EOF
 cat << EOF > /etc/systemd/system/incus-auto-snapshot-hourly.timer
 [Unit]
@@ -71,8 +71,8 @@ Description=Service for daily incus snapshots
 [Service]
 EnvironmentFile=/etc/incus-auto-snapshot.conf
 ExecStart=incus-auto-snapshot --prefix daily --expiry \$daily_expire --include-volumes
-StandardOutput=append:/var/log/incus-auto-snapshot.log
-StandardError=append:/var/log/incus-auto-snapshot.log
+#StandardOutput=append:/var/log/incus-auto-snapshot.log
+#StandardError=append:/var/log/incus-auto-snapshot.log
 EOF
 cat << EOF > /etc/systemd/system/incus-auto-snapshot-daily.timer
 [Unit]
@@ -93,8 +93,8 @@ Description=Service for weekly incus snapshots
 [Service]
 EnvironmentFile=/etc/incus-auto-snapshot.conf
 ExecStart=incus-auto-snapshot --prefix weekly --expiry \$weekly_expire --include-volumes
-StandardOutput=append:/var/log/incus-auto-snapshot.log
-StandardError=append:/var/log/incus-auto-snapshot.log
+#StandardOutput=append:/var/log/incus-auto-snapshot.log
+#StandardError=append:/var/log/incus-auto-snapshot.log
 EOF
 cat << EOF > /etc/systemd/system/incus-auto-snapshot-weekly.timer
 [Unit]
@@ -115,8 +115,8 @@ Description=Service for monthly incus snapshots
 [Service]
 EnvironmentFile=/etc/incus-auto-snapshot.conf
 ExecStart=incus-auto-snapshot --prefix monthly --expiry \$monthly_expire --include-volumes
-StandardOutput=append:/var/log/incus-auto-snapshot.log
-StandardError=append:/var/log/incus-auto-snapshot.log
+#StandardOutput=append:/var/log/incus-auto-snapshot.log
+#StandardError=append:/var/log/incus-auto-snapshot.log
 EOF
 cat << EOF > /etc/systemd/system/incus-auto-snapshot-monthly.timer
 [Unit]

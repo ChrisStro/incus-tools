@@ -31,7 +31,7 @@ incus config set MYINSTANCE user.auto-snapshot=true
 incus config set MYINSTANCE user.auto-snapshot=false # other value than 'true'
 
 # Check which instances are targeted
-incus ls user.auto-snapshot=true
+incus-auto-snapshot --list-enabled
 ```
 
 
@@ -61,6 +61,6 @@ incus config set MYINSTANCE user.auto-snapshot=true
 # Exclude instance if applied via profile
 incus config set MYINSTANCE user.auto-snapshot=false # other value than 'true'
 
-# Check which instances are targeted
-incus ls user.auto-snapshot=true
+# Check which source instances and volumes are configured for replication on source
+incus-repl-instance --source-server "REMOTE-SERVER" --list-sources
 ```

@@ -4,6 +4,7 @@ import subprocess
 import logging
 import json
 import argparse
+import sys
 
 logging.basicConfig(
     level=logging.INFO,
@@ -20,20 +21,32 @@ class IncusReplicator():
         # Snapshots
         self.clear_snaps    = kwargs['snap_name_to_clear']
         # Storage
-        self.source_pools   = self._get_remote_pools() if kwargs['target_custom_volume_pool'] else False
+        self.source_pools   = self._get_source_pools()
         self.target_pool    = kwargs['target_custom_volume_pool']
         # Replication
         self.filter         = "user.repl-instance=true"
         self.instances      = self.get_source_instances()
-        # Output
+        # Args
+        self.list_only      = kwargs['list_sources']
         self.verbose        = kwargs['verbose']
 
     # Instance
     def get_source_instances(self):
-        p = subprocess.run(["incus","ls",f"{ self.source_server }:","-cn","-fjson","--all-projects","user.repl-instance=true"], capture_output=True, text=True)
+        p = subprocess.run(["incus","ls",f"{ self.source_server }:","-fjson","--all-projects","user.repl-instance=true"], capture_output=True, text=True)
         if not p.stdout.strip():
             raise RuntimeError(f"ERROR: Could not get any instances on { self.source_server }")
         return json.loads(p.stdout)
+
+    def _print_source_instances(self):
+        table_data =  [["Project", "Name", "Type", "Snapshots"]]
+        table_data += [[instance['project'], instance['name'], instance['type'], len(instance['snapshots'])] for instance in self.instances]
+        col_widths = [max(len(str(row[i])) for row in table_data) for i in range(len(table_data[0]))]
+        print("+" + "+".join("-" * (w + 2) for w in col_widths) + "+")
+        print("| " + " | ".join(str(cell).ljust(w) for cell, w in zip(table_data[0], col_widths)) + " |")
+        print("+" + "+".join("-" * (w + 2) for w in col_widths) + "+")
+        for data in table_data[1:]:
+            print("| " + " | ".join(str(cell).ljust(w) for cell, w in zip(data, col_widths)) + " |")
+        print("+" + "+".join("-" * (w + 2) for w in col_widths) + "+")
 
     def _check_local_repl(self, instance_name):
         p = subprocess.run(["incus","ls","-cn","-fcsv",f"{ self.repl_prefix }--{ instance_name }",f"--all-projects",f"project={ self.target_project }"], capture_output=True, text=True)
@@ -86,14 +99,45 @@ class IncusReplicator():
         return snaps if snaps else False
 
     # Storage
-    def _get_remote_pools(self):
+    def _get_source_pools(self):
         p = subprocess.run(["incus","storage","list",f"{self.source_server}:","-cn","-f","csv"], capture_output=True, text=True)
         return p.stdout.splitlines()
 
-    def _get_remote_volumes(self,pool):
+    def _get_source_volumes(self,pool):
         p = subprocess.run(["incus","storage","volume","list",f"{ self.source_server }:{ pool }","-cn","-f","json","type=custom" ], capture_output=True, text=True)
         json_data = json.loads(p.stdout.strip())
-        return [v for v in json_data if v.get('config',{}).get("user.repl-volume") == "true"]
+        volume_rep_enabled = self._get_source_volume_filtered(json_data)
+        volumes_no_snaps = [v for v in volume_rep_enabled if "/" not in v['name']]
+
+        volumes_dict = []
+        for volume in volumes_no_snaps:
+            name                = volume.get('name')
+            project             = volume.get('project')
+            content_type        = volume.get('content_type')
+
+            volume_snap_count   = self._get_source_volume_snap_count(volume_rep_enabled,volume)
+            volumes_dict.append(dict(name=name,project=project,content_type=content_type,snaps=volume_snap_count))
+        return volumes_dict
+
+    def _get_source_volume_filtered(self,volume_data):
+        volume_filtered = [v for v in volume_data if v.get('config',{}).get("user.repl-volume") == "true"]
+        return volume_filtered
+
+    def _get_source_volume_snap_count(self,volume_data,volume):
+        volume_name = volume.get('name')
+        volume_snaps = [v for v in volume_data if f"{ volume_name }/" in v['name']]
+        return len(volume_snaps)
+
+    def _print_source_volumes_pretty(self,pool,volumes):
+        table_data =  [["Pool", "Project", "Name", "Content-Type", "Snapshots"]]
+        table_data += [[pool, volume['project'], volume['name'], volume['content_type'], volume['snaps']] for volume in volumes]
+        col_widths = [max(len(str(row[i])) for row in table_data) for i in range(len(table_data[0]))]
+        print("+" + "+".join("-" * (w + 2) for w in col_widths) + "+")
+        print("| " + " | ".join(str(cell).ljust(w) for cell, w in zip(table_data[0], col_widths)) + " |")
+        print("+" + "+".join("-" * (w + 2) for w in col_widths) + "+")
+        for data in table_data[1:]:
+            print("| " + " | ".join(str(cell).ljust(w) for cell, w in zip(data, col_widths)) + " |")
+        print("+" + "+".join("-" * (w + 2) for w in col_widths) + "+")
 
     def _check_local_volumes(self, volume_name):
         p = subprocess.run(["incus","storage","volume","list","-cn","-fcsv",self.target_pool,f"{ self.repl_prefix }--{ volume_name }",f"--all-projects"], capture_output=True, text=True)
@@ -122,19 +166,31 @@ class IncusReplicator():
             logging.info("Debug: Running in Debug mode")
             logging.getLogger().setLevel(logging.DEBUG)
 
-        [self.repl_instance(instance) for instance in self.instances]
+        if self.list_only:
+            if self.instances:
+                self._print_source_instances()
+            for pool in self.source_pools:
+                volumes = self._get_source_volumes(pool)
+                if volumes:
+                    self._print_source_volumes_pretty(pool,volumes)
+
+            sys.exit(0)
+
+        for instance in self.instances:
+            self.repl_instance(instance)
 
         if self.source_pools:
             for pool in self.source_pools:
-                volumes = self._get_remote_volumes(pool)
+                volumes = self._get_source_volumes(pool)
                 [self.repl_volume(pool,volume['name']) for volume in volumes]
 
 
 if __name__ == "__main__":
-    _parser = argparse.ArgumentParser(description="Python script creating incus snapshots")
+    _parser = argparse.ArgumentParser(description="Python script for automate replications")
+    # list group
     _parser.add_argument('--source-server',type=str, required=True,
                 help="Remote source server")
-    _parser.add_argument('--repl-prefix',type=str, required=True,
+    _parser.add_argument('--repl-prefix',type=str, required=False,
                 help="Prefix instance name with entered value")
     _parser.add_argument('--target-project',type=str,default='default',
                 help="Replicate instances to following project on local incus node")
@@ -142,8 +198,13 @@ if __name__ == "__main__":
                 help="Replicate custom storage volumes to following storage pool on local incus node")
     _parser.add_argument('--snap-name-to-clear',type=str,default="None",
                 help="All snapshots containing this string, will be deleted on source before replication")
+    _parser.add_argument('--list-sources',action="store_true", help="List replication enables resources on source server and exit")
     _parser.add_argument('--verbose',action="store_true", help="Verbose output")
     args    =   _parser.parse_args()
 
+    if args.list_sources and (not args.source_server):
+        _parser.error("When --list-sources, --source-server is required.")
+
+    #print(args.__dict__)
     replicator = IncusReplicator(**args.__dict__)
     replicator.invoke()
