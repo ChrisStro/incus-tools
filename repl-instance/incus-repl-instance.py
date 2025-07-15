@@ -98,17 +98,16 @@ class IncusReplicator():
             logging.debug(f"No snapshots available for { instance_name }")
             return 0,0
 
-    def _clone_instance_snap(self,instance_name,snap_name):
-        clone_name=f"clone-{ self.repl_prefix }--{ instance_name }-{ snap_name }".replace(":","-").replace("_","-")
+    def _clone_instance_snap(self,instance_name,snap_name:str):
+        short_snapname  = snap_name[-19:]
+        clone_name      =f"keep--{ instance_name }-{ short_snapname }".replace(":","-").replace("_","-")
         try:
             p = subprocess.run(["incus","ls",clone_name,"-fcsv","--all-projects"], capture_output=True, text=True)
             if not p.stdout:
                 logging.debug(f"Create { clone_name } from { snap_name }")
-                p = subprocess.run(["incus","copy",f"{ self.repl_prefix }--{ instance_name }/{ snap_name }",clone_name,"--project",self.target_project,"--target-project",self.target_project],check=True, capture_output=True, text=True)
-                if p.returncode != 0:
-                    raise RuntimeError(f"CLONE[SNAP]: {p.stderr}")
+                p = subprocess.run(["incus","copy",f"{ self.repl_prefix }--{ instance_name }/{ snap_name }",clone_name,"--project",self.target_project,"--target-project",self.target_project,"--force-local"],check=True, capture_output=True, text=True)
         except subprocess.CalledProcessError as e:
-            logging.error(f"Could not clone snap, { e }, details: { e.stderr }")
+            logging.error(f"Could not clone snap, { e }, DETAILS: { e.stderr }")
         except Exception as e:
             logging.error(f"Could not clone snap, { e }")
 
@@ -116,7 +115,7 @@ class IncusReplicator():
         p = subprocess.run(["incus","list","-cn","-fjson","--all-projects"], capture_output=True, text=True)
         try:
             json_data = json.loads(p.stdout.strip())
-            all_clones = [s for s in json_data if f"clone-" in s['name'] ]
+            all_clones = [s for s in json_data if f"keep--" in s['name'] ]
             instance_clones = [c['name'] for c in all_clones if f"{ self.repl_prefix }--{ instance_name }" in c['name'] ]
             return instance_clones
         except:
