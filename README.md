@@ -63,4 +63,7 @@ incus config set MYINSTANCE user.auto-snapshot=false # other value than 'true'
 
 # Check which source instances and volumes are configured for replication on source
 incus-repl-instance --source-server "REMOTE-SERVER" --list-sources
+
+# Use --keep <SNAPSHOT STRING> and --keep-count X to create clones of snapshots to protect against deletion on source. Last snapshot after each run will be cloned
+incus-repl-instance --source-server "REMOTE-SERVER" ... --keep "hourly" --keep-count 5
 ```
