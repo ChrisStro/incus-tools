@@ -41,7 +41,7 @@ For manual backup/restore, you can use an alternative storage migration technolo
 
 ```
 # Install incus-entitiy-backup
-curl https://raw.githubusercontent.com/ChrisStro/incus-tools/refs/heads/main/entitiy-backup/install-incus-entitiy-backup.sh | bash -
+curl https://raw.githubusercontent.com/ChrisStro/incus-tools/refs/heads/main/entity-backup/install-incus-entity-backup.sh | bash -
 ```
 
 You rely on raw storage technology for your replication, but recovery requires some skills.
