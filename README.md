@@ -3,7 +3,7 @@
 
 * [Description](#description)
 * [incus-auto-snapshot](#incus-auto-snapshot)
-* [incus-entity-backup](#incus-entity-backup)
+* [incus-entity-backup](#Incus-entity-backup)
 * [incus-repl-instance](#incus-repl-instance)
 
 # Description
@@ -35,7 +35,7 @@ incus config set MYINSTANCE user.auto-snapshot=false # other value than 'true'
 incus-auto-snapshot --list-enabled
 ```
 
-## Incus-entitiy-backup
+## Incus-entity-backup
 
 For manual backup/restore, you can use an alternative storage migration technology (e.g., Raw ZFS Send/Receive). Create your instance/storage volume from the Incus command line using the entity file and replace the created dataset via the ZFS command line.
 
