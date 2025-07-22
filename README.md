@@ -3,6 +3,7 @@
 
 * [Description](#description)
 * [incus-auto-snapshot](#incus-auto-snapshot)
+* [incus-entity-backup](#incus-entity-backup)
 * [incus-repl-instance](#incus-repl-instance)
 
 # Description
@@ -34,7 +35,30 @@ incus config set MYINSTANCE user.auto-snapshot=false # other value than 'true'
 incus-auto-snapshot --list-enabled
 ```
 
+## Incus-entitiy-backup
 
+For manual backup/restore, you can use an alternative storage migration technology (e.g., Raw ZFS Send/Receive). Create your instance/storage volume from the Incus command line using the entity file and replace the created dataset via the ZFS command line.
+
+```
+# Install incus-entitiy-backup
+curl https://raw.githubusercontent.com/ChrisStro/incus-tools/refs/heads/main/entitiy-backup/install-incus-entitiy-backup.sh | bash -
+```
+
+You rely on raw storage technology for your replication, but recovery requires some skills.
+
+```
+# Create instanze from entity manifest
+incus init images:debian/12 restored-c1 < my_restored_manifest.yml
+
+# Rename create storage volume
+zfs rename rpool/incus/containers/restored-c1 rpool/incus/containers/restored-c1-org
+
+# Clone zfs replicated dataset to container original one
+zfs clone rpool/repl/rpool/incus/containers/restored-c1 rpool/incus/containers/restored-c1
+
+# Start instance
+incus start restored-c1
+```
 
 ## Incus-repl-instance
 

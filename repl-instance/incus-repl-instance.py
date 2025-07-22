@@ -63,7 +63,7 @@ class IncusReplicator():
             subprocess.run(["incus","stop",f"{self.source_server}:{instance_name}"], capture_output=True, text=True)
 
         logging.info(f"Initial replication for { instance_name }")
-        p = subprocess.run(["incus","copy",f"{self.source_server}:{instance_name}",f"{ self.repl_prefix}--{instance_name}",f"--target-project={ self.target_project }","--stateless"], capture_output=True, text=True)
+        p = subprocess.run(["incus","copy",f"{self.source_server}:{instance_name}",f"{ self.repl_prefix}--{instance_name}",f"--target-project={ self.target_project }","--stateless","-c","boot.autostart=false"], capture_output=True, text=True)
 
         if instance_type == "container":
             logging.info(f"Starting { instance_name } after replication")
@@ -105,7 +105,7 @@ class IncusReplicator():
             p = subprocess.run(["incus","ls",clone_name,"-fcsv","--all-projects"], capture_output=True, text=True)
             if not p.stdout:
                 logging.debug(f"Create { clone_name } from { snap_name }")
-                p = subprocess.run(["incus","copy",f"{ self.repl_prefix }--{ instance_name }/{ snap_name }",clone_name,"--project",self.target_project,"--target-project",self.target_project,"--force-local"],check=True, capture_output=True, text=True)
+                p = subprocess.run(["incus","copy",f"{ self.repl_prefix }--{ instance_name }/{ snap_name }",clone_name,"--project",self.target_project,"--target-project",self.target_project,"--force-local","-c","boot.autostart=false"],check=True, capture_output=True, text=True)
         except subprocess.CalledProcessError as e:
             logging.error(f"Could not clone snap, { e }, DETAILS: { e.stderr }")
         except Exception as e:
