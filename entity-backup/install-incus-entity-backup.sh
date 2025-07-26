@@ -4,15 +4,25 @@ chown root:incus-admin /usr/local/bin/incus-entity-backup
 chmod 0700 /usr/local/bin/incus-entity-backup
 
 # create target directory
-which zfs && zfs create -o mountpoint=/incus-backup rpool/incus-backup || mkdir -p /incus-backup;
+which zfs && zfs create -o mountpoint=/incus-entities rpool/incus-entities || mkdir -p /incus-backup;
 
-# frequent snapshot
+# config file
+cat << EOF > /etc/incus-entitiy-backup.conf
+KEEP            =   5
+BASE_BACKUP_DIR =   "/incus-entities"
+COMPRESS        =   no
+EOF
+chmod 0600 /etc/incus-entitiy-backup.conf
+chown root:root /etc/incus-entitiy-backup.conf
+
+# entity entity
 cat << EOF > /etc/systemd/system/incus-entity-backup.service
 [Unit]
-Description=Service for frequent entity incus backups
+Description=Service for frequent entity incus entity
 
 [Service]
-ExecStart=incus-entity-backup 5 /incus-backup
+EnvironmentFile=/etc/incus-entitiy-backup.conf
+ExecStart=incus-entity-backup \$KEEP \$BASE_BACKUP_DIR \$COMPRESS
 EOF
 cat << EOF > /etc/systemd/system/incus-entity-backup.timer
 [Unit]

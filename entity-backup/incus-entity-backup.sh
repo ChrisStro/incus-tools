@@ -2,10 +2,12 @@
 set -e
 
 KEEP=${1:-5}
-BASE_BACKUP_DIR=${2:-"$HOME/incus-backups"}
+BASE_BACKUP_DIR=${2:-"$HOME/incus-entities"}
+COMPRESS=${3:-"yes"}
 
 echo "Keep Copies   : $KEEP"
 echo "Backup dir    : $BASE_BACKUP_DIR"
+echo "Compress dir  : $COMPRESS"
 
 # Falls kein Projekt existiert, sichert der Default "default"
 projects=$(incus project list -c n --format csv|sed 's/(current)//g')
@@ -60,13 +62,15 @@ done
 cp /etc/subuid $SUB_BACKUP_DIR/
 cp /etc/subgid $SUB_BACKUP_DIR/
 
-# Archivieren & Zwischenordner löschen
 cd "$BASE_BACKUP_DIR"
-ARCHIV_NAME="$(basename "$SUB_BACKUP_DIR").tar.gz"
-tar -czf "$ARCHIV_NAME" "$(basename "$SUB_BACKUP_DIR")"
-rm -rf "$SUB_BACKUP_DIR"
+if [[ $COMPRESS == "yes" ]];then
+  # Archivieren & Zwischenordner löschen
+  ARCHIV_NAME="$(basename "$SUB_BACKUP_DIR").tar.gz"
+  tar -czf "$ARCHIV_NAME" "$(basename "$SUB_BACKUP_DIR")"
+  rm -rf "$SUB_BACKUP_DIR"
+fi
 echo "Alle Projekt-Backups abgeschlossen."
 
 # Purge
-echo "Purge older backups based on $KEEP"
-ls -1t ${BASE_BACKUP_DIR}/incus-backup-*.tar.gz 2>/dev/null | tail -n +$((1 + $KEEP)) | xargs -r rm --
+echo "Purge older backups based on \$KEEP: $KEEP"
+ls -1t $BASE_BACKUP_DIR 2>/dev/null | tail -n +$((1 + $KEEP)) | xargs -r rm -rf --

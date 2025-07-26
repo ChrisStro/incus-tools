@@ -12,7 +12,7 @@ target_custom_volume_pool   =   default
 snap_name_to_clear          =   "None"
 EOF
 chmod 0600 /etc/incus-repl-instance.conf
-chown root:root /etc/incus-https://www.perplexity.ai/search/move-incus-container-to-proxmo-oVcXUFLHRUOrQq2yytP9ngrepl-instance.conf
+chown root:root /etc/incus-repl-instance.conf
 
 # daily replication
 cat << EOF > /etc/systemd/system/incus-repl-instance.service
