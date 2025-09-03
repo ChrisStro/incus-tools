@@ -5,6 +5,7 @@
 * [incus-auto-snapshot](#incus-auto-snapshot)
 * [incus-entity-backup](#Incus-entity-backup)
 * [incus-repl-instance](#incus-repl-instance)
+* [incus-postinstaller](#incus-postinstaller)
 
 # Description
 
@@ -58,6 +59,15 @@ zfs clone rpool/repl/rpool/incus/containers/restored-c1 rpool/incus/containers/r
 
 # Start instance
 incus start restored-c1
+```
+
+## Incus-postinstaller
+
+Script to add some general configuration to your incus server
+
+```
+# Run postinstaller script
+curl https://raw.githubusercontent.com/ChrisStro/incus-tools/refs/heads/main/postinstaller/incus-postinstaller.sh | bash -
 ```
 
 ## Incus-repl-instance
