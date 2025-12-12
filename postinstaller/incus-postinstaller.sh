@@ -20,6 +20,17 @@ if ! which zfs-auto-snapshot;then
     sed -i "s/keep=12/keep=3/g" /etc/cron.monthly/zfs-auto-snapshot
 fi
 
+# create zfs swap dataset
+if ! zfs list rpool/swap > /dev/null 2>&1 ; then
+    zfs create -o com.sun:auto-snapshot=false -o bashclub:zsync=exclude -o atime=off -o sync=always rpool/swap
+else
+    zfs set com.sun:auto-snapshot=false bashclub:zsync=exclude atime=off sync=always rpool/swap
+fi
+
+# configure vm.swappiness
+echo "vm.swappiness=30" > /etc/sysctl.d/swappiness.conf
+sysctl -w vm.swappiness=30 > /dev/null
+
 # oci registry
 if ! incus remote ls -fcsv |grep docker;then
     echo "Add docker registry to remote"
@@ -89,25 +100,6 @@ devices:
     type: tpm
 EOF
 incus profile create windows-install << EOF
-config:
-  limits.cpu: "6"
-  limits.memory: 6GiB
-description: Default Windows profile
-devices:
-  agent:
-    source: agent:config
-    type: disk
-  root:
-    io.bus: nvme
-    path: /
-    pool: rpool
-    size: 80GiB
-    type: disk
-  vtpm:
-    path: /dev/tpm0
-    type: tpm
-EOF
-incus profile create windows-install << EOF
 description: Windows install profile
 devices:
   install:
@@ -119,3 +111,15 @@ devices:
     source: virtio-win.iso
     type: disk
 EOF
+# incus profile create vlan-IOT << EOF
+# description: DMZ VLAN
+# devices:
+#   eth0:
+#     nictype: macvlan
+#     parent: incusbr0
+#     type: nic
+#     vlan: "66"
+# EOF
+
+# install some packages
+apt install iftop iotop fio tmux ncdu parted btop -y
