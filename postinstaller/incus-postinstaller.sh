@@ -8,16 +8,9 @@ if ! which incus;then
 fi
 
 # zfs-autosnapshots
-if ! which zfs-auto-snapshot;then
-    echo "Install zfs autosnapshots"
-    apt install -y zfs-auto-snapshot
-
-    # optimize zfs-auto-snapshot
-    sed -i "s/keep=4/keep=8/g" /etc/cron.d/zfs-auto-snapshot # frequent
-    sed -i "s/keep=24/keep=32/g" /etc/cron.hourly/zfs-auto-snapshot
-    sed -i "s/keep=31/keep=10/g" /etc/cron.daily/zfs-auto-snapshot
-    sed -i "s/keep=8/keep=4/g" /etc/cron.weekly/zfs-auto-snapshot
-    sed -i "s/keep=12/keep=3/g" /etc/cron.monthly/zfs-auto-snapshot
+if ! which sanoid;then
+    echo "Install sanoid"
+    apt install -y sanoid
 fi
 
 # create zfs swap dataset

@@ -4,7 +4,12 @@ chown root:incus-admin /usr/local/bin/incus-entity-backup
 chmod 0700 /usr/local/bin/incus-entity-backup
 
 # create target directory
-which zfs && zfs create -o mountpoint=/incus-entities rpool/incus-entities || mkdir -p /incus-backup;
+if command -v zfs >/dev/null 2>&1; then
+    ROOTDATASET=$(zfs list -Honame -d0|head -n1)
+    zfs create -o mountpoint=/incus-entities $ROOTDATASET/incus-entities
+    else
+    mkdir -p /incus-entities
+fi
 
 # config file
 cat << EOF > /etc/incus-entitiy-backup.conf
